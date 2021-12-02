@@ -60,7 +60,7 @@ impl Count3 {
     }
 }
 
-fn day01_1(input: &'static str) -> u64 {
+fn problem1(input: &'static str) -> u64 {
     input
         .lines()
         .map(|s| u64::from_str_radix(s, 10).unwrap())
@@ -68,7 +68,7 @@ fn day01_1(input: &'static str) -> u64 {
         .number()
 }
 
-fn day01_2(input: &'static str) -> u64 {
+fn problem2(input: &'static str) -> u64 {
     let input: Vec<_> = input
         .lines()
         .map(|s| u64::from_str_radix(s, 10).unwrap())
@@ -81,11 +81,11 @@ fn day01_2(input: &'static str) -> u64 {
 }
 
 #[test]
-fn day01_1_test() {
-    println!("{}", day01_1(include_str!("day01.txt")))
+fn problem1_test() {
+    println!("{}", problem1(include_str!("day01.txt")))
 }
 
 #[test]
-fn day01_2_test() {
-    println!("{}", day01_2(include_str!("day01.txt")))
+fn problem2_test() {
+    println!("{}", problem2(include_str!("day01.txt")))
 }

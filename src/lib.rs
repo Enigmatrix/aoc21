@@ -1,2 +1,4 @@
-#[allow(dead_code)]
+#![allow(dead_code)]
+
 mod day01;
+mod day02;
