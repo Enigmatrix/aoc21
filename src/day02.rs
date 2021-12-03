@@ -1,3 +1,5 @@
+const INPUT: &'static str = include_str!("day02.txt");
+
 enum Direction {
     Forward,
     Down,
@@ -73,16 +75,16 @@ impl Sub2 {
     }
 }
 
-fn problem1(input: &'static str) -> i64 {
-    input.lines()
+fn problem1() -> i64 {
+    INPUT.lines()
         .map(|s| s.split_once(' ').unwrap())
         .map(Instruction::from)
         .fold(Sub1::new(), |state, instr| state.apply(instr))
         .mul()
 }
 
-fn problem2(input: &'static str) -> i64 {
-    input.lines()
+fn problem2() -> i64 {
+    INPUT.lines()
         .map(|s| s.split_once(' ').unwrap())
         .map(Instruction::from)
         .fold(Sub2::new(), |state, instr| state.apply(instr))
@@ -91,11 +93,11 @@ fn problem2(input: &'static str) -> i64 {
 
 #[test]
 fn problem1_test() {
-    println!("{}", problem1(include_str!("day02.txt")))
+    println!("{}", problem1())
 }
 
 #[test]
 fn problem2_test() {
-    println!("{}", problem2(include_str!("day02.txt")))
+    println!("{}", problem2())
 }
 

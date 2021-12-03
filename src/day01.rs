@@ -1,3 +1,5 @@
+const INPUT: &'static str = include_str!("day01.txt");
+
 struct Count {
     prev: u64,
     number: u64,
@@ -60,16 +62,16 @@ impl Count3 {
     }
 }
 
-fn problem1(input: &'static str) -> u64 {
-    input
+fn problem1() -> u64 {
+    INPUT
         .lines()
         .map(|s| u64::from_str_radix(s, 10).unwrap())
         .fold(Count::new(), |count, number| count.include(number))
         .number()
 }
 
-fn problem2(input: &'static str) -> u64 {
-    let input: Vec<_> = input
+fn problem2() -> u64 {
+    let input: Vec<_> = INPUT
         .lines()
         .map(|s| u64::from_str_radix(s, 10).unwrap())
         .collect();
@@ -82,10 +84,10 @@ fn problem2(input: &'static str) -> u64 {
 
 #[test]
 fn problem1_test() {
-    println!("{}", problem1(include_str!("day01.txt")))
+    println!("{}", problem1())
 }
 
 #[test]
 fn problem2_test() {
-    println!("{}", problem2(include_str!("day01.txt")))
+    println!("{}", problem2())
 }
