@@ -1,108 +1,94 @@
-use std::collections::{BinaryHeap, HashMap};
+use crate::utils::*;
+use std::collections::{BTreeSet, HashMap};
 
 const INPUT: &'static str = include_str!("day09.txt");
 
-const DELTA: [(i64, i64); 4] = [(0, 1), (1, 0), (-1, 0), (0, -1)];
-
-struct Grid {
-    inner: Vec<Vec<i64>>,
+struct Map {
+    grid: Grid<i64>,
 }
 
-impl From<&str> for Grid {
+impl From<&str> for Map {
     fn from(input: &str) -> Self {
-        Grid {
-            inner: input
-                .lines()
-                .map(|s| {
-                    s.chars()
-                        .map(|c| c.to_string().parse::<i64>().unwrap())
-                        .collect()
-                })
-                .collect(),
+        Map {
+            grid: Grid::new(
+                input
+                    .lines()
+                    .map(|s| {
+                        s.chars()
+                            .map(|c| c.to_string().parse::<i64>().unwrap())
+                            .collect()
+                    })
+                    .collect(),
+            ),
         }
     }
 }
 
-impl Grid {
-    fn at(&self, x: i64, y: i64) -> Option<i64> {
-        if x < 0
-            || x >= self.inner.len() as i64
-            || y < 0
-            || y >= self.inner[x as usize].len() as i64
-        {
-            None
-        } else {
-            Some(self.inner[x as usize][y as usize])
+impl Map {
+    fn find_low(&self, idx: GridIndex) -> Option<GridIndex> {
+        if self.is_low(idx) {
+            return Some(idx);
         }
-    }
-
-    fn find_low(&self, x: i64, y: i64) -> Option<(i64, i64)> {
-        if self.is_low(x, y) {
-            return Some((x, y));
-        }
-        if let Some(p) = self.at(x, y) {
-            if p == 9 {
+        if let Some(p) = self.grid.at(idx) {
+            if p == &9 {
                 return None;
             }
-            for d in DELTA {
-                let (dx, dy) = (x + d.0, y + d.1);
-
-                if self.at(dx, dy).filter(|&p1| p1 < p).is_some() {
-                    return self.find_low(dx, dy);
-                }
-            }
+            return idx
+                .nswe_neighbors()
+                .filter_map(|nidx| {
+                    self.grid
+                        .at(nidx)
+                        .filter(|&p1| p1 < p)
+                        .map(|_| self.find_low(nidx))
+                })
+                .next()
+                .flatten();
         }
         None
     }
 
-    fn is_low(&self, x: i64, y: i64) -> bool {
-        for d in DELTA {
-            let (dx, dy) = (x + d.0, y + d.1);
-
-            if self
-                .at(dx, dy)
-                .zip(self.at(x, y))
+    fn is_low(&self, idx: GridIndex) -> bool {
+        idx.nswe_neighbors().all(|nidx| {
+            self.grid
+                .at(nidx)
+                .zip(self.grid.at(idx))
                 .filter(|(p1, p2)| p1 <= p2)
-                .is_some()
-            {
-                return false;
-            }
-        }
-        true
-    }
-
-    fn indices<'a>(&'a self) -> impl Iterator<Item = (i64, i64)> + 'a {
-        (0..self.inner.len() as i64)
-            .flat_map(|x| (0..self.inner[x as usize].len() as i64).map(move |y| (x, y)))
+                .is_none()
+        })
     }
 }
 
 fn problem1() -> i64 {
-    let grid = Grid::from(INPUT);
-    grid.indices()
-        .filter(|(x, y)| grid.is_low(*x, *y))
-        .filter_map(|(x, y)| grid.at(x, y).map(|p| p + 1))
+    let map = Map::from(INPUT);
+    map.grid
+        .indices()
+        .filter(|idx| map.is_low(*idx))
+        .filter_map(|idx| map.grid.at(idx).map(|p| p + 1))
         .sum()
 }
 
 fn problem2() -> i64 {
-    let grid = Grid::from(INPUT);
+    let map = Map::from(INPUT);
 
-    let mut lows: HashMap<_, _> = grid
+    let mut lows: HashMap<_, _> = map
+        .grid
         .indices()
-        .filter(|(x, y)| grid.is_low(*x, *y))
-        .map(|xy| (xy, 0i64))
+        .filter(|idx| map.is_low(*idx))
+        .map(|idx| (idx, 0i64))
         .collect();
 
-    grid.indices()
-        .filter_map(|(x, y)| grid.find_low(x, y))
+    map.grid
+        .indices()
+        .filter_map(|idx| map.find_low(idx))
         .for_each(|xy| *lows.get_mut(&xy).unwrap() += 1);
 
     lows.values()
-        .collect::<BinaryHeap<_>>()
+        .map(|i| -i)
+        .collect::<BTreeSet<_>>()
         .iter()
+        .map(|i| -i)
         .take(3)
-        .fold(1, |a, &&b| a * b)
+        .fold(1, |a, b| a * b)
 }
 
 #[test]
