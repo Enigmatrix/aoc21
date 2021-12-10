@@ -2,41 +2,6 @@ use std::collections::{BinaryHeap, HashMap};
 
 const INPUT: &'static str = include_str!("day09.txt");
 
-fn is_smallest(x: usize, y: usize, map: &Vec<Vec<i64>>) -> bool {
-    let delta: [(i64, i64); 4] = [(0, 1), (1, 0), (-1, 0), (0, -1)];
-    for d in delta {
-        let (dx, dy) = ((x as i64 + d.0) as i64, (y as i64 + d.1) as i64);
-        if dx < 0 || dx >= map.len() as i64 || dy < 0 || dy >= map[0].len() as i64 {
-            continue;
-        }
-        if map[dx as usize][dy as usize] <= map[x][y] {
-            return false;
-        }
-    }
-    true
-}
-
-fn find_low(x: usize, y: usize, map: &Vec<Vec<i64>>) -> Option<(usize, usize)> {
-    if is_smallest(x, y, &map) {
-        return Some((x, y));
-    }
-    if map[x][y] == 9 {
-        return None;
-    }
-
-    let delta: [(i64, i64); 4] = [(0, 1), (1, 0), (-1, 0), (0, -1)];
-    for d in delta {
-        let (dx, dy) = ((x as i64 + d.0) as i64, (y as i64 + d.1) as i64);
-        if dx < 0 || dx >= map.len() as i64 || dy < 0 || dy >= map[0].len() as i64 {
-            continue;
-        }
-        if map[dx as usize][dy as usize] < map[x][y] {
-            return find_low(dx as usize, dy as usize, map);
-        }
-    }
-    None
-}
-
 const DELTA: [(i64, i64); 4] = [(0, 1), (1, 0), (-1, 0), (0, -1)];
 
 struct Grid {
