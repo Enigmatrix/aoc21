@@ -68,12 +68,27 @@ impl<T> Grid<T> {
         Grid { inner }
     }
 
-    pub fn at(&self, idx: GridIndex) -> Option<&T> {
-        if idx.x < 0
+    pub fn nswe_neighbors(&self, idx: GridIndex) -> Vec<GridIndex> {
+        idx.nswe_neighbors()
+            .filter(|nidx| self.valid(*nidx))
+            .collect()
+    }
+
+    pub fn all_neighbors(&self, idx: GridIndex) -> Vec<GridIndex> {
+        idx.all_neighbors()
+            .filter(|nidx| self.valid(*nidx))
+            .collect()
+    }
+
+    pub fn valid(&self, idx: GridIndex) -> bool {
+        !(idx.x < 0
             || idx.x >= self.inner.len() as i64
             || idx.y < 0
-            || idx.y >= self.inner[idx.x as usize].len() as i64
-        {
+            || idx.y >= self.inner[idx.x as usize].len() as i64)
+    }
+
+    pub fn at(&self, idx: GridIndex) -> Option<&T> {
+        if self.valid(idx) {
             None
         } else {
             Some(&self[idx])
